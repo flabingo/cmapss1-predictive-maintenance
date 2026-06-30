@@ -1,0 +1,11 @@
+The Problem: "The Flatline Physics"
+  The Solution: Piece-wise Linear Degradation (Clipping)
+  df['RUL'] = df['RUL'].clip(upper=125)
+  self.model = RandomForestRegressor(n_estimators=200, max_depth=15, random_state=42)
+Got: 57.48% --> 72.88%
+
+The Problem: The Model Has "Amnesia"
+  X = df[['cycle', 'core_temperature', 'static_pressure', 'fan_speed']]
+  current_cycle = st.slider("Operational Age (Cycles)", 1, 250, 100, step=1)
+  input_data = np.array([[current_cycle, core_temp, static_pressure, fan_speed]])
+Got: 72.88% --> 81.36%

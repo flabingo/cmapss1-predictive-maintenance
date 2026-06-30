@@ -63,7 +63,7 @@ class CMAPSSDataPipeline:
         print("🧠 Splitting data for evaluation and training...")
         
         # 1. Define Features and Target
-        X = df[['core_temperature', 'static_pressure', 'fan_speed']]
+        X = df[['cycle', 'core_temperature', 'static_pressure', 'fan_speed']]
         y = df['RUL']
         
         # 2. Split data: 80% to train, 20% held back to test accuracy

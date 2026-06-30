@@ -31,12 +31,25 @@ metrics = load_metrics()
 # -----------------------------------------
 # LAYER 1: THE SIDEBAR CONTROLS
 # -----------------------------------------
+# with st.sidebar:
+#     st.header("🎛️ Live Sensor Feeds")
+#     st.caption("Adjust operational parameters to simulate engine wear.")
+#     st.markdown("---")
+    
+#     # ⚠️ FIXED RANGES: Matched exactly to the REAL NASA C-MAPSS Dataset
+#     core_temp = st.slider("Core Temp (Rankine)", 1580.0, 1620.0, 1589.0, step=0.5)
+#     static_pressure = st.slider("Static Pressure (psia)", 46.5, 48.5, 47.1, step=0.1)
+#     fan_speed = st.slider("Core Speed (RPM)", 9000.0, 9200.0, 9045.0, step=5.0)
+
 with st.sidebar:
     st.header("🎛️ Live Sensor Feeds")
     st.caption("Adjust operational parameters to simulate engine wear.")
     st.markdown("---")
     
-    # ⚠️ FIXED RANGES: Matched exactly to the REAL NASA C-MAPSS Dataset
+    # 🚀 NEW SLIDER: Engine Age
+    current_cycle = st.slider("Operational Age (Cycles)", 1, 250, 100, step=1)
+    
+    # Existing Sliders
     core_temp = st.slider("Core Temp (Rankine)", 1580.0, 1620.0, 1589.0, step=0.5)
     static_pressure = st.slider("Static Pressure (psia)", 46.5, 48.5, 47.1, step=0.1)
     fan_speed = st.slider("Core Speed (RPM)", 9000.0, 9200.0, 9045.0, step=5.0)
@@ -53,7 +66,7 @@ st.header("📊 Diagnostics & Analytics")
 
 # Calculate RUL 
 if model is not None:
-    input_data = np.array([[core_temp, static_pressure, fan_speed]])
+    input_data = np.array([[current_cycle, core_temp, static_pressure, fan_speed]])
     predicted_rul = int(model.predict(input_data)[0])
 else:
     # Simulated fallback just in case the .pkl is missing
@@ -158,19 +171,18 @@ with col4:
     st.subheader("🧠 Model Explainability")
     st.caption("Random Forest Feature Importance (What drives failures?)")
     
-    # Extracting real feature importances if the model exists, else mocking the physics
+    # Check if the model has the feature importances attribute
     if model is not None and hasattr(model, 'feature_importances_'):
         importances = model.feature_importances_
     else:
-        # In a real turbofan, temperature is usually the highest driver of fatigue
-        importances = [0.65, 0.25, 0.10] 
+        # If no model, provide a 4-value dummy array to match the 4 features
+        importances = [0.40, 0.35, 0.15, 0.10] 
         
+    # FIX: Ensure index length matches the number of importances (4)
     importance_df = pd.DataFrame({
         'Impact on Degradation': importances
-    }, index=['Core Temperature', 'Static Pressure', 'Core Speed'])
+    }, index=['Operational Cycle', 'Core Temperature', 'Static Pressure', 'Core Speed'])
     
-    # Display a beautiful horizontal bar chart
+    # Display the bar chart
     st.bar_chart(importance_df, use_container_width=True)
-
-
 
