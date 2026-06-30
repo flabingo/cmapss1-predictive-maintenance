@@ -1,3 +1,4 @@
+import json
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -16,6 +17,16 @@ def load_model():
 
 model = load_model()
 
+# Load the model validation metrics
+@st.cache_data
+def load_metrics():
+    try:
+        with open('model_metrics.json', 'r') as f:
+            return json.load(f)
+    except Exception:
+        return {"r2_accuracy": "Training Required"}
+
+metrics = load_metrics()
 
 # -----------------------------------------
 # LAYER 1: THE SIDEBAR CONTROLS
@@ -72,9 +83,11 @@ else:
     color = "green"
 
 # Metrics Display
-m1, m2 = st.columns(2)
+m1, m2, m3 = st.columns(3)
 m1.metric("Current Engine Status", "Online")
 m2.metric("Predicted Remaining Useful Life", f"{predicted_rul} Cycles")
+m3.metric("AI Validation Accuracy (R²)", metrics['r2_accuracy'])
+
 
 st.markdown(
     f"<h3>System Alert: <span style='color:{color}; font-weight:700'>{status}</span></h3>",
@@ -158,3 +171,6 @@ with col4:
     
     # Display a beautiful horizontal bar chart
     st.bar_chart(importance_df, use_container_width=True)
+
+
+
